@@ -30,6 +30,7 @@ export type WinSCMOptions = {
    * absolute path to the local copy of a 'winscmWorker.js' file
    */
   workerPath: string,
+  workerB64Path?: string,
   /**
    * optional, native library will use this file for logging, can be useful for troubleshooting
    */

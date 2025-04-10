@@ -16,6 +16,7 @@
 
 import { winscmStartDispatcher } from "../ts/mod.ts";
 import { libPath, scmLogPath, workerPath } from "./paths.ts";
+import { startServer, stopServer } from "./server.ts";
 import setupLogging from "./setupLogging.ts";
 
 const logger = await setupLogging();
@@ -29,7 +30,15 @@ try {
     workerPath: workerPath
   });
   logger.critical("'winscmStartDispatcher' is called, going to await on it ...");
+  logger.info("Starting server ...");
+  const server = await startServer();
+
   await prom;
+
+  logger.info("'winscmStartDispatcher' resolved, stopping server ...");
+
+  await stopServer(server);
+  
   logger.info("'winscmStartDispatcher' success");
 } catch (e) {
   logger.info(`'winscmStartDispatcher' failure, error: [${e}]`);

@@ -50,26 +50,39 @@ export default async function winscmStartDispatcher(opts: WinSCMOptions) {
       "WinSCM service name must be specified",
     );
   }
-  if (
-    !("string" === typeof (opts.workerPath) && opts.workerPath.length > 0)
-  ) {
-    throw new Error(
-      "Path to worker module must be specified"
-    );
-  }
-  if (!existsSync(opts.workerPath)) {
-      throw new Error(
-        `Specified worker module does not exist, path: [${opts.workerPath}]`
-      );
-  }
 
-  const workerPath = `file://${opts.workerPath}`;
+  let workerPath;
+
+  if (
+    !("string" === typeof (opts.workerB64Path) && opts.workerB64Path.length > 0)
+  ) {
+
+    if (
+      !("string" === typeof (opts.workerPath) && opts.workerPath.length > 0)
+    ) {
+      throw new Error(
+        "Path to worker module must be specified"
+      );
+    }
+    if (!existsSync(opts.workerPath)) {
+        throw new Error(
+          `Specified worker module does not exist, path: [${opts.workerPath}]`
+        );
+    }
+
+    workerPath = `file://${opts.workerPath}`;
+  } else {
+    workerPath = opts.workerB64Path;
+  }
   const worker = new Worker(workerPath, {
     type: "module",
     name: opts.workerName ?? "WinSCMWorker",
-    deno: {
-      namespace: true,
-    },
+    // deno: {
+    //   permissions: {
+    //     read: true,
+    //   }
+    //   // namespace: true,
+    // },
   });
   workerStarted = true;
 

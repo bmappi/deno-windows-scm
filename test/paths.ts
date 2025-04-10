@@ -16,11 +16,12 @@
 
 import {
   dirname,
-  fromFileUrl,
+  fileURLToPath,
   join,
 } from "./deps.ts";
 
-const dirPath = dirname(dirname(fromFileUrl(import.meta.url)));
+const filePath = fileURLToPath(import.meta.url);
+const dirPath = dirname(dirname(filePath));
 const libPath = join(dirPath, "target/debug/deno_windows_scm.dll");
 const testLogPath = join(dirPath, "target/test_log.txt");
 const scmLogPath = join(dirPath, "target/scm_log.txt");

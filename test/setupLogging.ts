@@ -1,38 +1,36 @@
-/*
- * Copyright 2021, alex at staticlibs.net
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import { Logger, log } from "./deps.ts";
 import { testLogPath } from "./paths.ts";
 
-export default async (): Promise<Logger> => {
-  await log.setup({
-    handlers: {
-      file: new log.handlers.FileHandler("DEBUG", {
-        filename: testLogPath,
-        mode: "w",
-      }),
-    },
+export interface SimpleLogger {
+  info(msg: string): Promise<void>;
+  critical(msg: string): Promise<void>;
+}
 
-    loggers: {
-      default: {
-        level: "DEBUG",
-        handlers: ["file"],
-      },
-    },
-  });
+export default async (logFilePath: string = testLogPath): Promise<SimpleLogger> => {
+  // Ensure the log file exists and is ready for writing
+  const file = await Deno.open(logFilePath, { write: true, create: true, truncate: true });
 
-  return log.getLogger();
-};
+  // Helper function to write logs to file
+  async function writeLog(level: string, message: string) {
+
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] [${level}] ${message}\n`;
+
+    // Write the log message to file
+    await Deno.writeTextFile(logFilePath, logMessage, { append: true });
+    if (level === "CRITICAL") {
+      // Flush the file for critical messages
+      await file.sync();
+    }
+  }
+
+  const logger: SimpleLogger = {
+    async info(msg: string) {
+      await writeLog("INFO", msg);
+    },
+    async critical(msg: string) {
+      await writeLog("CRITICAL", msg);
+    }
+  };
+
+  return logger;
+}
