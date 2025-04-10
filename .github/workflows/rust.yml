@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --release
-    - run: ls
+    - run: ls target\release
     - name: Run tests
       run: cargo test --verbose
     - name: Rename DLL with tag
