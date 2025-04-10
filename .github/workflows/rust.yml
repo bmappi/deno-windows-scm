@@ -18,16 +18,26 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --release
-    - run: ls target\release
     - name: Run tests
       run: cargo test --verbose
-    - name: Rename DLL with tag
-      run: |
-        $tag = "${{ github.ref_name }}"
-        Rename-Item "target\release\deno_windows_scm.dll" "deno_windows_scm_$tag.dll"
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: deno_windows_scm
-        path: deno_windows_scm_${{ github.ref_name }}.dll
+        name: deno_windows_scm.dll
+        path: target\release\deno_windows_scm.dll
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: deno_windows_scm.pdb
+        path: target\release\deno_windows_scm.pdb
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: deno_windows_scm.dll.lib
+        path: target\release\deno_windows_scm.dll.lib
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: deno_windows_scm.dll.exp
+        path: target\release\deno_windows_scm.dll.exp
     
